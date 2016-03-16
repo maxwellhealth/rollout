@@ -20,13 +20,10 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     private $collection;
 
-    public function __construct($mongo, $collection = "rollout_feature")
+    public function __construct(\MongoClient $mongo, $collection = "rollout_feature")
     {
         $this->mongo = $mongo;
-
-        if ($collection) {
-            $this->collection = $collection;
-        }
+        $this->collection = $collection;
     }
     public function getCollectionName()
     {
@@ -37,7 +34,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     public function get($key)
     {
-        $collection = $this->collection;
+        $collection = $this->getCollectionName()
         $result = $this->mongo->$collection->findOne(['name' => $key]);
 
         if (!$result) {
@@ -52,7 +49,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     public function set($key, $value)
     {
-        $collection = $this->collection;
+        $collection = $this->getCollectionName();
         $this->mongo->$collection->update(['name' => $key], ['$set' => ['value' => $value]]);
     }
 
@@ -61,7 +58,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     public function remove($key)
     {
-        $collection = $this->collection;
+        $collection = $this->getCollectionName();
         $this->mongo->$collection->remove(['name' => $key]);
     }
 
