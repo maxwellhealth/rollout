@@ -20,7 +20,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     private $collection;
 
-    public function __construct(\MongoClient $mongo, $collection = "rollout_feature")
+    public function __construct(\MongoDB $mongo, $collection = "rollout_feature")
     {
         $this->mongo = $mongo;
         $this->collection = $collection;
