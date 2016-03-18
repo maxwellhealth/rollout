@@ -34,7 +34,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     public function get($key)
     {
-        $collection = $this->getCollectionName()
+        $collection = $this->getCollectionName();
         $result = $this->mongo->$collection->findOne(['name' => $key]);
 
         if (!$result) {
