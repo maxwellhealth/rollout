@@ -50,7 +50,7 @@ class MongoDBStorageAdapter implements StorageInterface
     public function set($key, $value)
     {
         $collection = $this->getCollectionName();
-        $this->mongo->$collection->update(['name' => $key], ['$set' => ['value' => $value]]);
+        $this->mongo->$collection->update(['name' => $key], ['$set' => ['value' => $value]], ['upsert' => true]);
     }
 
     /**
