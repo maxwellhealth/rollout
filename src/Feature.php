@@ -203,7 +203,7 @@ class Feature
     private function isUserInActiveGroup(RolloutUserInterface $user, Rollout $rollout)
     {
         foreach ($this->groups as $group) {
-            if ($rollout->isActiveInGroup($group, $user)) {
+            if ($rollout->isActiveInGroup($group, $user, $this)) {
                 return true;
             }
         }

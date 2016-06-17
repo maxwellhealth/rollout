@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  */
 
 namespace Opensoft\Rollout;
@@ -160,7 +160,7 @@ class Rollout
      * @param RolloutUserInterface $user
      * @return bool
      */
-    public function isActiveInGroup($group, RolloutUserInterface $user)
+    public function isActiveInGroup($group, RolloutUserInterface $user, Feature $feature)
     {
         if (!isset($this->groups[$group])) {
             return false;
@@ -168,7 +168,7 @@ class Rollout
 
         $g = $this->groups[$group];
 
-        return $g && $g($user);
+        return $g && $g($user, $feature);
     }
 
     /**
@@ -251,4 +251,4 @@ class Rollout
         }
         $this->storage->set($this->featuresKey(), implode(',', $features));
     }
-} 
+}
