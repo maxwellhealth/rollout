@@ -71,7 +71,7 @@ class MongoDBStorageAdapterTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class mockMongo extends \MongoDB
+class mockMongo extends \MongoClient
 {
     public $collection;
     public function __construct()
