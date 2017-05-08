@@ -3,7 +3,6 @@
 namespace Opensoft\Tests\Storage;
 
 use Opensoft\Rollout\Storage\MongoDBStorageAdapter;
-
 class MongoDBStorageAdapterTest extends \PHPUnit_Framework_TestCase
 {
     private $mongo;
@@ -12,7 +11,9 @@ class MongoDBStorageAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $this->mongo = new mockMongo();
         $collection = $this->mockCollection();
-        $collection->method('findOne')->will($this->returnValue(['name' => 'key', 'value' => true]));
+        $arrayObj =  new \ArrayObject([['name' => 'key', 'value' => true]]);
+        $cursor = $arrayObj->getIterator();
+        $collection->method('find')->will($this->returnValue($cursor));
         $collection->method('update')->will($this->returnValue(null));
 
         $this->mongo->setCollection($collection);
@@ -31,7 +32,7 @@ class MongoDBStorageAdapterTest extends \PHPUnit_Framework_TestCase
     {
 
         $adapter = new MongoDBStorageAdapter($this->mongo);
-        $this->mongo->coll->method('findOne')->will($this->returnValue(null));
+        $this->mongo->coll->method('find')->will($this->returnValue(null));
         $result = $adapter->get('key');
         $this->assertSame(true, $result);
     }

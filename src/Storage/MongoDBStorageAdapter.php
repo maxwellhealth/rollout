@@ -20,28 +20,66 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     private $collection;
 
+    private $cache = [];
     public function __construct(\MongoDB $mongo, $collection = "rollout_feature")
     {
         $this->mongo = $mongo;
         $this->collection = $collection;
+
     }
     public function getCollectionName()
     {
         return $this->collection;
     }
+
+    public function setCache($cache)
+    {
+        $this->cache = $cache;
+    }
+
+    public function resetCache()
+    {
+        $this->cache = [];
+    }
+
+    public function getFromCache($key)
+    {
+        if (empty($this->cache)) {
+            return null;
+        }
+        if (isset($this->cache[$key]) && $item = $this->cache[$key]) {
+            return $item;
+        }
+    }
+
     /**
      * @inheritdoc
      */
     public function get($key)
     {
+        if ($item = $this->getFromCache($key)) {
+            return $item['value'];
+        }
         $collection = $this->getCollectionName();
-        $result = $this->mongo->$collection->findOne(['name' => $key]);
+        $result = $this->mongo->$collection->find();
 
-        if (!$result) {
+        $result = iterator_to_array($result);
+
+        if (count($result) === 0) {
             return null;
         }
 
-        return $result['value'];
+        $toggles = array_reduce($result, function($acc, $toggle) {
+            $acc[$toggle['name']] = $toggle;
+            return $acc;
+        }, []);
+        $this->setCache($toggles);
+        $item = $this->getFromCache($key);
+        if (!isset($item)) {
+            return null;
+        }
+
+        return $item['value'];
     }
 
     /**
@@ -50,6 +88,7 @@ class MongoDBStorageAdapter implements StorageInterface
     public function set($key, $value)
     {
         $collection = $this->getCollectionName();
+        $this->resetCache();
         $this->mongo->$collection->update(['name' => $key], ['$set' => ['value' => $value]], ['upsert' => true]);
     }
 
@@ -58,6 +97,7 @@ class MongoDBStorageAdapter implements StorageInterface
      */
     public function remove($key)
     {
+        $this->resetCache();
         $collection = $this->getCollectionName();
         $this->mongo->$collection->remove(['name' => $key]);
     }
