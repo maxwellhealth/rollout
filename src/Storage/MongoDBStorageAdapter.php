@@ -63,11 +63,12 @@ class MongoDBStorageAdapter implements StorageInterface
         $collection = $this->getCollectionName();
         $result = $this->mongo->$collection->find();
 
-        $result = iterator_to_array($result);
-
-        if (count($result) === 0) {
+        if ($result->count() === 0) {
             return null;
         }
+
+        $result = iterator_to_array($result);
+
 
         $toggles = array_reduce($result, function($acc, $toggle) {
             $acc[$toggle['name']] = $toggle;
